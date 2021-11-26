@@ -1,0 +1,132 @@
+---
+title: "Data Frames"
+author: "Ahmad Abdalla"
+date: "11/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## DataFrame
+###  Data frame is a two dimensional data structure in R. It is a special case of a list which has each component of equal length.
+#### • Data frames are used to store tabular data in R.
+#### • It is an Important type of object in R, used in a variety of statistical modeling applications.
+#### • Unlike matrices, data frames can store different classes of objects in each column.
+#### • Data frames have a special attribute called row.names which indicate information about each row of the data frame.
+
+#### • Data frames are usually created by reading in a dataset using the read.table(..) or read.csv(..).
+#### • Data frames can also be created explicitly with the data.frame(..) function or they can be coerced from other types of objects like lists.
+
+### Creating Data Frames from Vectors
+```{r}
+n = c(2 , 3, 5)
+s = c("aa", "bb", "cc")
+b = c(TRUE , FALSE , TRUE )
+df = data.frame (n, s, b) # df is a data frame
+df
+```
+
+
+### downloading mtcars data frame
+
+```{r cars}
+data(mtcars)
+mtcars
+```
+
+### checking out the meta data for mtcars using these functions
+
+```{r pressure, echo=FALSE}
+class(mtcars)
+typeof(mtcars)
+str(mtcars)
+summary(mtcars)
+row.names(mtcars)
+head(mtcars)
+tail(mtcars)
+View(mtcars)
+ncol(mtcars)
+nrow(mtcars)
+```
+### how to retrieve data value from row 1, column 2
+```{r}
+mtcars[1,2]
+```
+
+### how to retrieve data value from row 1, column 2 using the names
+```{r}
+mtcars["Mazda RX4", "cyl"]
+
+```
+### how to retrieve data of a row eg Volvo 142E
+
+```{r}
+mtcars["Volvo 142E",]
+```
+### retrieve two rows (any rows, up to you)
+```{r}
+mtcars[5:6,]
+```
+### retrieve data for column mpg
+```{r}
+mtcars[,"mpg"]
+```
+### what is the class of the output given to you by R?
+```{r}
+class(mtcars[,"mpg"])
+```
+### is it a data frame?
+### how do you get back data frame
+
+```{r}
+class(mtcars[,"mpg", drop = FALSE])
+```
+### can you use drop when retrieving data using names ?
+
+```{r}
+print("yes you can as been tried above")
+```
+
+## Factors
+#### • Factor is a data structure used for fields that takes only predefined, finite number of values (categorical data). For example: a data field such as marital status may contain only values from single, married, separated, divorced, or widowed.
+#### • In such case, we know the possible values beforehand and these predefined, distinct values are called levels.
+
+#### ►Factors are used to represent categorical data.
+#### ►One can think of a factor as an integer vector where each integer has a label.
+#### ►Factors are important in statistical modeling.
+#### ►Using factors with labels is better than using integers because factors are self-describing.
+
+### to create a factor object we use the factor() function
+```{r}
+x<-factor(c("single","married","married","single"));
+x
+```
+### the levels of a factor maybe defined even if not used:
+```{r}
+x<-factor(c("single","married","married","single"),
+levels=c("single","married","divorced"));
+x
+str(x)
+
+```
+### Levels are stored in a character vector and the individual elements are actually stored as indices. Accessing components of a factor is very similar to that of vectors.
+### accessing factors
+#### x[3] #access the third element
+#### x[4]
+#### x[c(2,4)] #access the 2nd and 4th
+#### x[-1] #access all but 1st
+#### x[c(TRUE,FALSE,FALSE,TRUE)]#uselogical vector for 1st and last
+
+### Invalid assignment
+```{r}
+x[3]<-"widowed" #cannot assign outside values
+```
+### A workaround to this is to add the value to the level first. 
+```{r}
+levels(x)<-c(levels(x), "widowed") #add widowed to level
+x
+x[3]<-"widowed" #widowed already added to level
+ x
+```
