@@ -1,0 +1,32 @@
+---
+title: "Functions"
+author: "Ahmad Abdalla"
+date: "11/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Write a function called top that returns takes a matrix or data frame, and returns the first n rows and columns :
+```{r}
+mat <- matrix(1:50, 10)
+
+top <- function(a, b){
+  c<- a[1:b, 1:b]
+  return(c)
+}
+top(mat, 3)
+```
+#### Functions can accept arguments explicitly assigned to a variable name in the function call functionName(variable = value).
+```{r}
+input_1 <- 20
+mySum <- function( input_1, input_2 = 10) {
+  output <- input_1 + input_2
+  return( output )
+}
+mySum(3)
+mySum( input_1 = 1, input_2 = 3)
+```
+
