@@ -1,0 +1,60 @@
+---
+title: "Apply Family"
+author: "Ahmad Abdalla"
+date: "11/25/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Apply Family
+#### they are Functions to manipulate slices of data from matrices, arrays, lists and dataframes in a repetitive way.
+
+### apply() function is the base function. apply() function takes 3 arguments:
+#### 1- data matrix/data frame
+#### 2- row/column operation, – 1 for row wise operation, 2 for column wise operation
+#### 3- function to be applied on the data.
+### apply the function ‘sum’ to the matrix X along margin 2 (by column), summing up the values of each column
+```{r }
+x <- matrix(1:50, 5)
+x
+apply(x, 2, sum)
+```
+### sapply( li, fct )
+#### Like apply, it transverse over a set of data (list or vector) and call the function for each item.
+```{r}
+fct <- function(x){ return(c(x,x*x, x*x*x))}
+sapply(1:5, fct)
+```
+#### sapply works on lists too
+```{r}
+l <- list(a = 1:10, b = 11:20)
+sapply(l, mean)
+
+```
+### lapply( li, fct )
+#### • The difference between lapply() and apply() lies between the output return. The output of lapply() is a list.
+#### • lapply() can be used for other objects like data frames and lists.
+#### • lapply function in R, returns a list of the same length as input list object, each element of which is the result of applying FUN to the corresponding element of list.
+#### • Compare to sapply
+```{r}
+l <- list(a = 1:10, b = 11:20)
+lapply(l, mean)
+```
+### tapply
+#### tapply() is a very powerful function that lets you break a vector into pieces and then apply some function to each of the pieces. In the below code, first each of mpg in mtcars data is grouped by cylinder type and then mean() function is calculated.
+```{r}
+data(mtcars)
+mtcars
+tapply(mtcars$mpg, mtcars$cyl, mean)
+```
+### mapply
+#### mapply stands for ‘multivariate’ apply. Its purpose is to be able to vectorize arguments to a function that is not usually accepting vectors as arguments. In short, mapply applies a Function to Multiple List or multiple Vector Arguments
+```{r}
+weight <- list(females = c(55, 61, 52, 48), males = c(78, 91, 83, 102))
+hieght <- list(females = c(1.65, 1.63, 1.71, 1.54), males = c(1.83, 1.90, 1.77, 1.85))
+calBMI <- function(KG, m){KG/m^2}
+mapply(calBMI, KG = weight, m = hieght)
+```
