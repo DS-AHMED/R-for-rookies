@@ -1,0 +1,95 @@
+---
+title: "Subsetting"
+author: "Ahmad Abdalla"
+date: "11/25/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Subsetting
+### Selecting (and keeping) or deleting (dropping) variables and observations, or to take random samples from a dataset.
+#### Given a data frame, how can we access the elements within the data frame?  
+#### •	Select  & exclude variables
+#### •	Select observations
+
+### Selecting Variables
+#### Assuming you have a data frame called myvars with 5 variables; v1 to v5
+#### select variables v1, v2, v3
+myvars <- c("v1", "v2", "v3")
+newdata <- mydata[myvars]
+
+#### select 1st and 4th thru 5th variables
+newdata <- mydata[c(1,4:5)]
+Excluding Variables
+
+#### exclude variables v1, v2, v3  this is new
+
+myvars <- names(mydata) %in% c("v1", "v2", "v3") 
+newdata <- mydata[!myvars]
+
+#### exclude 3rd and 5th variable 
+newdata <- mydata[c(-3,-5)]
+
+#### delete variables v3 and v5
+mydata$v3 <- mydata$v5 <- NULL
+
+### download this dataset 
+```{r }
+hsb2.small <- read.csv("https://stats.idre.ucla.edu/stat/data/hsb2_small.csv")
+hsb2.small
+```
+### viewing the names of the columns
+```{r}
+names(hsb2.small)
+```
+
+#### We can select only columns 1,7, and 8 to be displayed and saved in hsb3. 
+```{r}
+hsb3 <- hsb2.small[,c(1,7,8)]
+hsb3
+```
+#### If the variables we want are in consecutive columns, we can use the colon notation rather than list them using the c function. In the next example we create the data frame hsb4 containing the first four variables of hsb2.small.
+```{r}
+hsb4 <- hsb2.small[,1:4]
+hsb4
+```
+####We can also subset observations based on logical tests. We create the data frame hsb6, which contains only the observations for which ses=1 ? For a logical equality we need to use the double equal sign notation. We also need to refer to the variable, ses in the data frame hsb2.small, which we do using $.
+```{r}
+hsb6 <- hsb2.small[hsb2.small$ses == 1,]
+hsb6
+```
+#### We can also subset using a logical test that will test a single variable being equal to the elements in a list, and we do this by using the %in% function. In the following example we create the data frame hsb7, which contains the observations where id is equal to 11, 12, 20, 48, 86 or 195.
+```{r}
+hsb7 <- hsb2.small[hsb2.small$id %in% c(12,48, 86, 11, 20, 195), ]
+hsb7
+```
+#### It is also possible to combine logical tests. In the following example we create the data frame hsb8, which contains only the observations where ses=3 and female=0. Here to avoid having to type hsb2.small multiple times, we use the with function to let R know that it should look for ses and female inside the hsb2.small data frame.
+```{r}
+hsb8 <- hsb2.small[with(hsb2.small, ses == 3, female == 0),]
+hsb8
+```
+### Subsetting is an easier way to select variables and observations.
+#### The subset function with a logical statement will let you subset the data frame by observations. In the following example the write.50 data frame contains only the observations for which the values of the variable write is greater than 50. Note that one convenient feature of the subset function, is R assumes variable names are within the data frame being subset, so there is no need to tell R where to look for write.
+```{r}
+write.50 <- subset(hsb2.small, write >50)
+write.50
+```
+#### There is no limit to how many logical statements may be combined to achieve the subsetting that is desired. The data frame write.1 contains only the observations for which the values of the variable write is greater than 50 and for which the variable read is greater than 60.
+```{r}
+write.1 <- subset(hsb2.small, write >50 & read >60)
+write.1
+```
+#### It is possible to subset both rows and columns using the subset function. The select argument lets you subset variables (columns). The data frame write.2 contains only the variables write and read and then only the observations of these two variables where the values of variable write are greater than 50 and the values of variable read are greater than 65.
+```{r}
+write.2 <- subset(hsb2.small, write >50 & read >65, select = c(write, read))
+write.2
+
+```
+#### In the data frame write.3 contains only the observations in variables read through science for which the values in the variable science are less than 55.
+```{r}
+wrtie.3 <- subset(hsb2.small, science < 55, select = read:science)
+write.3
+```
