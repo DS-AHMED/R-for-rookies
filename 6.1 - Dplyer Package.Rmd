@@ -1,0 +1,120 @@
+---
+title: "Dplyer package"
+author: "Ahmad Abdalla"
+date: "12/8/2021"
+output: html_document
+---
+
+
+### Loading Dplyer library after installing it 
+```{r}
+library(dplyr)
+```
+### One handy feature with dplyr is the glimpse(..) function. This is  an improvement over str(..).
+#### Use glimpse(..) to see the structure of the dataset and  decide  what manipulation is required.
+```{r}
+glimpse(mtcars)
+```
+### sum()
+#### Count the observations in a column in the data frame.
+```{r}
+sum(mtcars$cyl ==8)
+sum(mtcars$gear > 4 )
+```
+### select()
+#### Selects a range of variables and can exclude some variables
+
+#### select(df,A,B,C)	Select the variables A,B and C  from df dataset.
+#### select(df,A:C)		Select all variables from A to C from df dataset.
+#### select(df, -C)		Exclude C from the dataset from df  dataset.
+#### Can use variable names as well as integer index
+
+```{r}
+select(mtcars, cyl:wt)
+select(mtcars, cyl:wt, -hp)
+select(mtcars, 1:4, -3)
+
+select (mtcars, starts_with("c"))
+select (mtcars, starts_with("c"),   ends_with("t"))
+
+```
+### Helper Functions
+#### Dplyr has helper functions to help select a group of variables inside a select()
+#### starts_with(“x”) 	every name that starts with “x”
+#### ends_with(“x”)	every name that ends with “x”
+#### contains(“x”)	every name that contains “x”
+#### matches(“x”)	every name that matches “x”, where “x” can be a regular expression
+#### num_range(“x”, 1:5)	the variable named x01, x02, x03, x04, x05
+#### one_of(x)		every name that appears in x, which should be a character vector
+
+#### Note : when referring to variables directly inside select(), don’t use quotes “”. When using helper function, use quotes
+```{r}
+select(mtcars, contains('c')) 
+select(mtcars, matches('a')) 
+select(mtcars, num_range("mpg", 1:5)) 
+select(mtcars, one_of("mpg", "cyl"))
+```
+### mutate(
+#### Creates new column and add to a copy of the dataset
+#### Syntax:   
+#### mutate(df, z=x+y)
+#### Can add multiple variables
+#### Can also use the newly created variable
+#### mutate(df, z=x+y, zz = z+v)
+```{r}
+mtM <- mutate(mtcars, hpp = hp/10)
+mtM
+```
+### filter()
+#### The filter(..) helps to keep the observations following a criteria.
+#### The filter(..) works exactly like select(), you pass the data  frame first and then a condition separated by a comma
+#### filter(df, condition)
+#### We can filter a dataset with more than one criteria.
+```{r}
+filter(mtcars, cyl == 8, qsec >16)
+filter(mtcars, cyl == 8 & qsec >16)
+filter(mtcars, (cyl == 8 | cyl == 6) & qsec >16)
+filter(mtcars, cyl %in% c(4,8))
+filter(mtcars, !is.na(mpg))  # choose only observations which value of x is not NA
+```
+### arrange()
+#### To arrange rows according to any type of data
+#### Default is ascending. To arrange in descending order, use desc()
+```{r}
+arrange(mtcars, cyl)
+arrange(mtcars, cyl, mpg)
+arrange(mtcars, cyl, desc(mpg))
+```
+### arranging a filtered data set
+```{r}
+arrange(filter(mtcars, (cyl == 8 | cyl == 6) & qsec >16), desc(cyl))
+```
+### arranging a filtered data set with selected variables
+```{r}
+arrange(filter(select(mtcars, mpg:vs, -disp, -drat), (cyl == 8 | cyl == 6) & qsec >16), desc(cyl) )
+```
+### summarise()
+#### summarise() creates a new data frame. It will have one (or more) rows for each combination of grouping variables; if there are no grouping variables, the output will have a single row summarising all observations in the input. It will contain one column for each grouping variable and one column for each of the summary statistics that you have specified.
+```{r}
+summarise(mtcars, mean = mean(mpg), n = n())
+summarise(mtcars, min_mpg = min(mpg))
+summarise(mtcars, max_mpg = max(mpg),min_mpg = min(mpg))
+```
+#### In summarise(), can use any aggregating function that can take a vector of data and return a single number including min(), max(), mean(), median(), quantile(), sd(), var()
+```{r}
+summarise(filter(mtcars, cyl ==8), min_mpg = min(mpg), max_mpg = max(mpg))
+```
+### pipeline
+#### The dplyr library comes with a practical operator, % >%, called the  pipeline. The pipeline feature makes the manipulation clean, fast and less  prompt to error. use the pipeline operator %>%  define  the data frame used at the beginning and all the process will flow  from it.
+```{r}
+newmtpipe <- mtcars %>% select ( mpg:vs, -disp, -drat) %>%
+  filter((cyl == 8 | cyl == 6) & qsec >16) %>% arrange(desc(cyl))
+newmtpipe
+```
+#### another example for a pipeline
+```{r}
+newsumpipe <- mtcars %>% filter(cyl == 8) %>% summarise(min_mpg = min(mpg), max_mpg = max(mpg))
+newsumpipe
+```
+
+
