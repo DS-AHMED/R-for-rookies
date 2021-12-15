@@ -1,0 +1,140 @@
+---
+title: "Data Wrangling - Cleaning your Data (tidyr)"
+author: "Ahmad Abdalla"
+date: "12/15/2021"
+output: html_document
+---
+
+## TIBBLE
+#### Whenever working with rectangular data structures — data consisting of multiple cases (rows) and variables (columns) — our first step (in a tidyverse context) is to create or transform the data into a tibble. A tibble is a rectangular data table and a modern and simpler version of the data.frame construct in R.
+
+### Loading tidyvesre library
+```{r}
+library(tidyverse)
+```
+#### tibbles do not change the types of input variables (e.g., strings are not converted to factors);
+#### tibbles do not change the names of input variables and do not use row names.
+#### Tibbles are quite flexible in also allowing for non-syntactic variable (column) names. For instance, in contrast to data frames, the variable names in tibbles can start with a number or contain spaces
+
+### changing mtcars data frame to tibble
+```{r}
+mtc<-as_tibble(mtcars)
+class(mtc)
+mtc
+```
+### runing some of the dplyr codes to see how they interact with mtc which is a tibble now
+```{r}
+sum(mtc$gear > 4 )
+select(mtc, 1:4, -3)
+select (mtc, starts_with("c"),   ends_with("t"))
+select(mtc, num_range("mpg", 1:5))
+mtM <- mutate(mtc, hpp = hp/10)
+mtM
+filter(mtc, cyl %in% c(4,8))
+arrange(mtc, cyl, desc(mpg))
+arrange(filter(select(mtc, mpg:vs, -disp, -drat), (cyl == 8 | cyl == 6) & qsec >16), desc(cyl) )
+summarise(mtc,  max_mpg = max(mpg),min_mpg = min(mpg))
+newmtpipe <- mtc %>% select ( mpg:vs, -disp, -drat) %>%
+  filter((cyl == 8 | cyl == 6) & qsec >16) %>% arrange(desc(cyl))
+newmtpipe
+```
+## TIDYR
+### it is a package that reshape the layout of tables
+### Gather()
+#### It collapses multiple columns into key-variable pair
+#### the input of gather are: gather(df, key, value, column), where key is the column that represents the variables that are converted to columns, and value represent the column that has the values from the previous columns.
+```{r}
+messy <- data.frame("name" = c("ahmed", "khalid", "yousif"), a = c(50, 80, 90), b = c(70, 90, 10))
+messy
+gather(messy, drug, heartrate, 2:3)
+```
+### spread()
+#### • takes two columns (key & value) and spreads in to multiple columns
+#### • Convert long data to wide. spread(df, key, value)
+```{r}
+area <- data.frame(city = c("madinah", "jeddeh", "ryadh","madinah", "jeddeh", "ryadh"),
+                   size = c("small", "large","small","large", "small","large"),
+                   amount= c(40,100,120,50, 90, 110))
+area
+spread(area, size, amount)
+```
+### separate()
+#### • Multiple variables are stored in one column .
+#### • Separate into multiple columns
+#### • separate(df, data, colname)
+```{r}
+sep <- data.frame(a = c("1.a", "2.b", "3.c"))
+sep
+seped <- separate(sep, a, c("num", "char"))
+seped
+```
+### unite()
+#### • To join variables 
+#### • unite(df, newcol, original_colums)
+```{r}
+united <- unite(seped, a, c("num", "char"))
+united
+```
+## lubridate
+### a package that helps date conversion
+#### loading the lubridate package
+```{r}
+library(lubridate)
+```
+### experimenting with basic lubridate functions
+```{r}
+ymd("2015-8-25")
+ymd("2015 August 25")
+mdy("August 25, 2015")
+hms("08:44:34")
+ymd_hms("2015/08/25 08.44.34")
+```
+## stringr
+### A package that works with strings
+#### loading the stringr package
+```{r}
+library(stringr)
+```
+### experimenting with basic stringr functions
+```{r}
+str_trim("  this this is ahemd   ")
+str_pad("0551", width = 7, side = "left", pad = "5")
+friends <- c("salah", "ibrahim", "omar", "osama")
+str_detect(friends, "ibrahim")
+str_replace(friends, "omar", "odai")
+
+```
+### Other cleaning processes:
+#### • toupper(), Change string touppercases
+#### • tolower(), Change string touppercases
+```{r}
+upper <- toupper("hi I'm funny")
+upper
+lower <- tolower(upper)
+lower
+```
+## missing values
+### Use is.na() to find NA values in dataset
+```{r}
+x <- c(1,2,3,NA)
+is.na(x)
+!is.na(x)
+```
+#### Exclude missing value from analyses
+```{r}
+x <- c(1,2,NA,3)
+mean(x) # returns NA
+mean(x, na.rm=TRUE) 
+complete.cases(x)
+any(is.na(x)) #use any to check if there is any NA values
+na.omit(x) # to remove the NA values, in dataframe this function remove the rows that contain NA values.
+```
+## visualizing some graphs
+### histogram
+```{r}
+hist(mtcars$mpg)
+```
+### boxplot
+```{r}
+boxplot(mtcars$mpg)
+```
