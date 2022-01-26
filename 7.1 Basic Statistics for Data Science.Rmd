@@ -1,0 +1,137 @@
+---
+title: "Basic statistics for data science"
+author: "Ahmad Abdalla"
+date: "1/5/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# types of statistical measurements
+## 1- measures of freuqency: it represents the number of occurances of a data value in a given data set.
+
+
+## 2- measures of central tendency: it indicates whether the data values accomulate in the middle of the distribution or towards the end
+### they're usually measured by the mean, median and mode.
+
+
+## 3- measures of spread: it describes how similar or varied a set of values are for a variable. which are usually measured by the standard deviation, variance and quartiles.
+### Standard deviation: is the square root of the variance.
+### The Variance: is the average of the squared differences from the mean. variance = sum((Xi-X)^2)/n
+#### Xi is each value in the variable, X is the mean of the values, n is the number of values or the number of observations.
+#### the larger the standard deviation means the larger the spread of values around the mean.
+
+
+## 4- measures of postion: identifies the exact location of a variable value in a data set.
+### usually measured by percentiles, quortiles and standard scores.
+
+### Z score or standards score : 
+#### it gives the precise location of a value within the distribution in relation to the mean.
+#### it gives the number of standard deviations that a score lies.
+#### when it's greater than zero it means that it's greater than the mean and vice versa.
+#### the critical Z score values when using a 95% confidence level are 1.96 and -1.96 standard deviations.
+
+# Confidence level:
+## Choosing alpha value :
+### 0.05 most often used (must be less than 0.05)
+### The chance of making type I error (REJECT the null H when it is ACTUALLY TRUE)
+### (eg. probably will make 1 error in 20 times)
+### We want to be at least 95% confident that when reject the null hypothesis, that it is the correct decision.
+### Note : When doing 2-tailed test. Alpha 0.05 will be divided into two
+
+## Type I error
+### When you REJECT the null hypothesis when the null hypothesis is TRUE
+### you reject H0 and you shouldn’t
+### Type II error
+### When you FAIL to reject when the null hypothesis is FALSE
+### you don’t reject H0 and you should have
+
+## Hypothesis testing - Parametric tests:
+###  T-test: determine whether two datasets are significantly different from each other or not.
+### ANOVA: it's a generailzed version of T-tests, it's used when the means of the interval dependent variable are different according to the independent categorical vairable. it's used when we want to check the variance between two vrariables.
+### Chi-square: it is a statistical test that is used to compare observed data with the expected data to obtain according to a specific hypothesis .
+### Linear regression:
+#### Simple Linear Regression: is used to test how well a variable can be used to predict another variable.
+#### mutiple linear regression: is used to test how well a set of multiple independent variables can predict another variable
+
+
+# Regression Model
+
+## example for a regression model
+```{r}
+ml <- lm(mpg~cyl, mtcars) #lm() is sued to build the regression model
+summary(ml)
+```
+
+## finding the correlations between mtcars variables.
+```{r}
+cor(mtcars, method = "pearson")
+```
+
+## residual plots
+```{r}
+m1<-lm(mpg~cyl,data=mtcars)
+par(mfrow=c(2,2)) # to plot more than one graph, in this case we set it to 4 graphs
+plot(m1)
+
+```
+
+## parametric test ANOVA (analysis of variance table)
+```{r}
+anova(ml)
+```
+
+## predicting with linear regression
+```{r}
+library(ggplot2)
+X = c(3,4,4,2,5,3,4,5,3,2)
+Y= c(57,78,72,58,89,63,73,84,75,48)
+DF<-data.frame(X,Y)
+plot(DF)
+ggplot(DF, aes(X,Y)) + geom_point() + geom_smooth(method = "lm")
+cor(DF)
+cor.test(DF$X, DF$Y)
+f = lm(Y~X)
+summary(f)
+
+```
+
+## predict mpg based on hp in mtcars dataset
+```{r}
+library(dplyr)
+to_correlate <- mtcars %>% dplyr::select(mpg, qsec, cyl, disp, hp)
+plot(to_correlate)
+
+ggplot(to_correlate, aes(y=mpg, x=hp)) + geom_point() +
+geom_smooth(method="lm", se=FALSE)
+
+ggplot(to_correlate, aes(y=mpg, x=hp)) + geom_jitter(width=0.1) +
+stat_smooth(method="lm", se=FALSE)
+
+cor(to_correlate)
+cor.test(mtcars$mpg, mtcars$hp)
+FC = lm(mpg~hp, data=mtcars)
+summary(FC)
+predict(FC, newdata = data.frame(hp=100), interval = "prediction")
+```
+
+## how to draw multiple regression lines
+```{r}
+ggplot(mtcars, aes(x=hp, y=mpg,
+color=factor(am))) + geom_point() +
+stat_smooth(method=lm, se=FALSE)
+```
+## drawing one regression line while dividing the data into to groups using hte variable (am)
+```{r}
+i_model <- lm(mpg ~ hp + am, mtcars)
+
+ggplot(i_model, aes(x=hp, y=mpg)) +
+geom_point(aes(color= factor(am))) +
+geom_smooth(method="lm", se=FALSE)
+
+prediction1 = predict(i_model, newdata =
+data.frame(hp = 110,am = 1), interval = "prediction")
+prediction1
+```
