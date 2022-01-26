@@ -1,0 +1,66 @@
+---
+title: "Plots"
+author: "Ahmad Abdalla"
+date: "1/5/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Basic plots
+
+```{r}
+plot( mtcars$wt, mtcars$mpg) #default type p
+plot(mtcars$wt, mtcars$mpg, type = "l")
+plot(mtcars$wt, mtcars$mpg, type = "p")
+plot(mpg ~ wt, data = mtcars)
+plot(wt ~ mpg, data = mtcars)
+plot(wt, mpg, data= mtcars) #error
+plot(mtcars$wt, mtcars$mpg, main = "mtcars dataset", xlab = "X axis wt", ylab = "Y axis mpg")
+plot(mtcars$wt, mtcars$mpg, main = "mtcars dataset", xlab = "X axis wt", ylab = "Y axis mpg",
+pch = 19, frame = F)
+line(lowess(mtcars$wt, mtcars$mpg), col = "blue")
+```
+
+## Understanding the ggplot Syntax
+### ggplot works with dataframes and not individual vectors.
+### All the data needed to make the plot is typically be contained within the dataframe supplied to the ggplot() itself or can be supplied to respective geoms.
+### Another noticeable feature is that you can keep enhancing the plot by adding more layers (and themes) to an existing plot created using the ggplot() function.
+
+## examples:
+```{r}
+qplot(wt, mpg, data = mtcars, geom= c("point"))
+qplot(wt, mpg, data = mtcars, geom= c("smooth"))
+qplot(wt, mpg, data = mtcars, geom= c("point","smooth"))
+qplot(wt, mpg, data = mtcars, color=cyl) #better if char or factor
+qplot(mpg, wt, data = mtcars, colour = cyl)
+qplot(mpg, data = mtcars, fill=cyl ) #the data doesnt reflect
+mt<-mtcars
+mt$cyl<- as.factor(mt$cyl)
+qplot(mpg, wt, data = mt, colour = cyl) #better with factor data
+```
+
+## ggplot2 package examples while supplying the edits to respective geoms
+```{r}
+ggplot(mtcars, aes(wt, mpg)) + geom_point()
+ggplot(mtcars, aes(wt, mpg)) + geom_point() + geom_smooth() #default method
+ggplot(mtcars, aes(wt, mpg)) + geom_point() + geom_smooth(method = "lm")
+ggplot(mtcars, aes(wt, mpg)) + geom_point(aes(color=cyl))
+ggplot(mtcars, aes(wt, mpg)) + geom_point(aes(color= factor(cyl))) #can change to factor
+ggplot(mtcars, aes(x = factor(cyl))) + geom_bar()
+```
+## adding labels and titles
+```{r}
+g2<-ggplot(mtcars, aes(wt, mpg)) + geom_point(aes(color= factor(cyl))) #can change to factor
+g2 + labs( title =" Mpg vs Wt ", subtitle =" optional title",
+y=" mpg ", x=" wt ", caption =" mtcars Dataset ")
+#or
+g2 + ggtitle (" Mpg vs Wt ", subtitle =" optional title") +
+xlab (" Mpg ") + ylab (" wt ")
+#or full
+ggplot(mtcars, aes(wt, mpg)) + geom_point(aes(color= factor(cyl))) +
+labs( title =" Mpg vs Wt ", subtitle =" optional title",
+y=" mpg ", x=" wt ", caption =" mtcars Dataset ")
+```
