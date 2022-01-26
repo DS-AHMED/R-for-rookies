@@ -1,0 +1,268 @@
+---
+title: "Machine learning for data science"
+author: "Ahmad Abdalla"
+date: "1/5/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Machine Learning
+
+## Splitting the data
+```{r}
+library(caret)
+data(iris) # load the iris dataset
+split=0.80 # define an 80%/20% train/test split of the dataset
+trainIndex <- createDataPartition(iris$Species, p=split, list=FALSE)
+data_train <- iris[ trainIndex,]
+data_test <- iris[-trainIndex,]
+data_train
+
+```
+
+## Training the model
+```{r}
+# load the libraries
+library(caret)
+library(klaR) #to use NaiveBayes()
+data(iris) # load the iris dataset
+split=0.80 # define an 80%/20% train/test split of the dataset
+trainIndex <- createDataPartition(iris$Species, p=split, list=FALSE)
+data_train <- iris[ trainIndex,]
+data_test <- iris[-trainIndex,]
+# train a naive bayes model
+model <- NaiveBayes(Species~., data=data_train)
+# make predictions
+x_test <- data_test[,1:4]
+y_test <- data_test[,5]
+predictions <- predict(model, x_test)
+
+confusionMatrix(predictions$class, y_test) # summarize results
+```
+
+## another method to train the model
+```{r}
+set.seed(3333)
+trainingw
+knn_fit <- train(Species ~., data = data_train, method = "knn",
+metric="Accuracy")
+knn_fit #knn classifier
+fit <- train(Employed~., data=longley, method="lm", metric="RMSE")
+fit<-train(mpg ~ ., data = mtcars, method = "lm", metric="Rsquared")
+fit <- train(diabetes~., data=PimaIndiansDiabetes, method="glm", metric="ROC")
+
+```
+
+## sf
+```{r}
+set.seed(12L)
+tr <- sample(150, 50)
+nw <- sample(150, 50)
+library("class")
+knn
+knnres <- knn(iris[tr, -5], iris[nw, -5], iris$Species[tr])
+head(knnres)
+# Note : this is using knn() in class package
+```
+
+# how to limit overfitting?
+## Both overfitting and underfitting can lead to poor model performance. But by far the most common problem in applied machine learning is overfitting
+
+## There are two important techniques that you can use when evaluating machine learning algorithms to limit overfitting:
+###  Use a resampling technique to estimate model accuracy.
+### Hold back a validation dataset.
+
+## The most popular resampling technique is k-fold cross validation. It allows you to train and test your model k-times on different subsets of training data and build up an estimate of the performance of a machine learning model on unseen data.
+
+## A validation dataset is simply a subset of your training data that you hold back from your machine learning algorithms until the very end of your project. After you have selected and tuned your machine learning algorithms on your training dataset you can evaluate the learned models on the validation dataset to get a final objective idea of how the models might perform on unseen data.
+
+## Using cross validation is a gold standard in applied machine learning for estimating model accuracy on unseen data. If you have the data, using a validation dataset is also an excellent practice.
+
+# Cross Validation
+
+## Systematically creates and evaluates multiple models on multiple subsets of the dataset.
+
+## K-fold
+### the data is divided into k subsets
+### the holdout method is repeated k times, such that each time, one of the k subsets is used as the test set/ validation set and the other k-1 subsets are put together to form a training set. This process is completed until accuracy is determine for each instance in the dataset, and an overall accuracy estimate is provided.
+
+## Train control
+```{r}
+library(caret)
+library(e1071)
+data(iris)
+TrainData <- iris[,1:4]
+TrainClasses <- iris[,5]
+knnFit1 <- train(TrainData, TrainClasses,
+method = "knn",
+preProcess = c("center", "scale"),
+tuneLength = 10,
+trControl = trainControl(method = "cv"))
+
+```
+
+## Train Model
+```{r}
+library(caret)
+data(iris) # load the iris dataset
+split=0.80 # define an 80%/20% train/test split of the dataset
+trainIndex <- createDataPartition(iris$Species, p=split, list=FALSE)
+data_train <- iris[ trainIndex,]
+data_test <- iris[-trainIndex,]
+#use train() and trainControl()
+train_control <- trainControl(method="cv", number=10)
+# train the model
+model1 <- train(Species~., data=data_train, trControl=train_control,
+method="nb")
+predictions1<-predict(model1, newdata = data_test)
+cm1<-confusionMatrix(predictions1,data_test$Species)
+cm1
+```
+
+## K fold R code sample
+```{r}
+# load the library
+library(caret)
+# load the iris dataset
+data(iris)
+# define training control
+train_control <- trainControl(method="cv", number=10)
+# fix the parameters of the algorithm
+grid <- expand.grid(.fL=c(0), .usekernel=c(FALSE))
+# train the model
+model <- train(Species~., data=iris, trControl=train_control, method="nb")
+# summarize results
+print(model)
+```
+
+## Repeated K Fold Sample Code
+```{r}
+# load the library
+library(caret)
+# load the iris dataset
+data(iris)
+# define training control
+train_control <- trainControl(method="repeatedcv", number=10, repeats=3)
+# train the model
+model <- train(Species~., data=iris, trControl=train_control, method="nb")
+# summarize results
+print(model)
+```
+
+## leave on out CV sample code
+```{r}
+# load the library
+library(caret)
+# load the iris dataset
+data(iris)
+# define training control
+train_control <- trainControl(method="LOOCV")
+# train the model
+model <- train(Species~., data=iris, trControl=train_control, method="nb")
+# summarize results
+print(model)
+```
+
+## BootStrap Sample Code
+```{r}
+# load the library
+library(caret)
+# load the iris dataset
+data(iris)
+# define training control
+train_control <- trainControl(method="boot", number=100)
+# train the model
+model <- train(Species~., data=iris, trControl=train_control, method="nb")
+# summarize results
+print(model)
+```
+
+## Accuracy
+```{r}
+# load libraries
+library(caret)
+library(mlbench)
+# load the dataset
+data(PimaIndiansDiabetes)
+# prepare resampling method
+control <- trainControl(method="cv", number=5)
+set.seed(7)
+fit <- train(diabetes~., data=PimaIndiansDiabetes, method="glm", metric="Accuracy",
+trControl=control)
+# display results
+print(fit)
+```
+
+## RMSE
+```{r}
+# load libraries
+library(caret)
+# load data
+data(longley)
+# prepare resampling method
+control <- trainControl(method="cv",
+number=5)
+set.seed(7)
+fit <- train(Employed~., data=longley,
+method="lm", metric="RMSE",
+trControl=control)
+# display results
+print(fit)
+```
+
+## ROC/AUC
+```{r}
+# load libraries
+library(caret)
+library(mlbench)
+# load the dataset
+data(PimaIndiansDiabetes)
+# prepare resampling method
+control <- trainControl(method="cv", number=5,
+classProbs=TRUE, summaryFunction=twoClassSummary)
+set.seed(7)
+fit <- train(diabetes~., data=PimaIndiansDiabetes,
+method="glm", metric="ROC", trControl=control)
+# display results
+print(fit)
+
+```
+
+## Predicting and classifying 
+```{r}
+knn_fit <- train(V1 ~., data = training, method = "knn",
+trControl=trctrl,
+preProcess = c("center", "scale"),
+tuneLength = 10)
+knn_fit #knn classifier
+#plot accuracy vs K Value graph
+plot(knn_fit)
+#predict classes for test set using knn classifier
+test_pred <- predict(knn_fit, newdata = testing)
+test_pred
+#Test set Statistics
+confusionMatrix(test_pred, testing$V1 ) #check accuracy
+
+
+
+
+
+#Training & Preprocessing
+trctrl <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+set.seed(3333)
+knn_fit <- train(diagnosis ~., data = trainingw, method = "knn",
+trControl=trctrl,
+preProcess = c("center", "scale"),
+tuneLength = 20)
+knn_fit #knn classifier
+#plot accuracy vs K Value graph
+plot(knn_fit)
+#predict classes for test set using knn classifier
+test_pred <- predict(knn_fit, newdata = testingw)
+test_pred
+#Test set Statistics
+confusionMatrix(test_pred, testingw$diagnosis ) #check accuracy
+```
